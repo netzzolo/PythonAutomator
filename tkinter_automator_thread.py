@@ -3,10 +3,17 @@ from Tkinter import *
 import ttk, tkFileDialog, time
 import threading
 
+# globals
+running = 1
 
 
 def startauto(*args):
     try:
+        #set running to 1 so the countdown loop runs
+        global running
+        running = 1
+        print ("start " + str(running))
+        #make the start button look like a stop button
         startb.config(relief=SUNKEN, bg="red", text="Stop", command=stopb)
         # Disable All options
         senario_length_entry.config(state=DISABLED)
@@ -15,7 +22,10 @@ def startauto(*args):
         audiobutton.config(state=DISABLED)
         logbutton.config(state=DISABLED)
         # countdown! running in its own thread
-        CD_thread.set()
+        CD_thread = threading.Thread(target=countdown,
+                                     args=(TXon_entry.get(), TXoff_entry.get(), senario_length_entry.get()))
+        CD_thread.start()
+
 
     except ValueError:
         pass
@@ -30,7 +40,9 @@ def stopb(*args):
         TXoff_entry.config(state=NORMAL)
         audiobutton.config(state=NORMAL)
         logbutton.config(state=NORMAL)
-        CD_thread.clear()
+        # stop the while loop
+        global running
+        running = 0
 
     except ValueError:
         pass
@@ -52,7 +64,8 @@ def chooselog(*args):
     try:
         logfileC = tkFileDialog.asksaveasfilename(initialdir="/", title="Select Log File", \
                                                   filetypes=(
-                                                  ("CSV files", "*.csv"), ("TXT files", "*.txt"), ("All Files", "*.*")))
+                                                      ("CSV files", "*.csv"), ("TXT files", "*.txt"),
+                                                      ("All Files", "*.*")))
         logbutton.config(text="Log File:")
         print(logfileC)
         logfile.set(logfileC)
@@ -61,56 +74,55 @@ def chooselog(*args):
 
 
 def countdown(i, j, k):
-    CD = threading.currentThread()
-    while getattr(CD, "do_run", TRUE):
+    # CD = threading.currentThread()
+    # while getattr(CD, "do_run", TRUE):
 
-        TxUpC = int(i)
-        TxDownC = int(j)+int(i)
-        SenLenC = int(float(k)*60)
+    TxUpC = int(i)
+    TxDownC = int(j) + int(i)
+    SenLenC = int(float(k) * 60)
+    global running
+
+    while SenLenC > -1 and running == 1:
+        # make the minutes and/or seconds pretty
+        SLmins, SLsecs = divmod(SenLenC, 60)
+        TUmins, TUsecs = divmod(TxUpC, 60)
+        TDmins, TDsecs = divmod(TxDownC, 60)
+        SCtimeformat = '{:02d}:{:02d}'.format(SLmins, SLsecs)
+        TUtimeformat = '{:02d}:{:02d}'.format(TUmins, TUsecs)
+        TDtimeformat = '{:02d}:{:02d}'.format(TDmins, TDsecs)
+
+        # update the timer block
+        Stimer.config(text=SCtimeformat)
+        txremain.config(text=TUtimeformat)
+        Itimer.config(text=TDtimeformat)
+
+        # Decrement all timers
+        SenLenC -= 1
+        if TxUpC > 0:
+            TxUpC -= 1
+        TxDownC -= 1
+        print("Down - " + str(TxDownC))
+        print("Up - " + str(TxUpC))
+        print("Sen - " + str(SenLenC))
+
+        # loop TX up counter and Interval Timer until scenario is finished
+        if TxUpC < 1 and TxDownC < 1:
+            print("made it")
+            TxUpC = int(i)
+        if TxDownC < 1:
+            TxDownC = int(i) + int(j)
+
+        root.update_idletasks()
+        time.sleep(1)
+
+    print("hello")
 
 
-        while SenLenC > -1:
-            #make the minutes and/or seconds pretty
-            SLmins, SLsecs = divmod(SenLenC, 60)
-            TUmins, TUsecs = divmod(TxUpC, 60)
-            TDmins, TDsecs = divmod(TxDownC,60)
-            SCtimeformat = '{:02d}:{:02d}'.format(SLmins, SLsecs)
-            TUtimeformat = '{:02d}:{:02d}'.format(TUmins, TUsecs)
-            TDtimeformat = '{:02d}:{:02d}'.format(TDmins, TDsecs)
-
-            #update the timer block
-            Stimer.config(text=SCtimeformat)
-            txremain.config(text=TUtimeformat)
-            Itimer.config(text=TDtimeformat)
-
-            #Decrement all timers
-            SenLenC -= 1
-            if TxUpC > 0:
-                TxUpC -= 1
-            TxDownC -= 1
-            print("Down - " + str(TxDownC))
-            print("Up - " + str(TxUpC))
-            print("Sen - " + str(SenLenC))
-
-            # loop TX up counter and Interval Timer until scenario is finished
-            if TxUpC < 1 and TxDownC < 1:
-                print("made it")
-                TxUpC = int(i)
-            if TxDownC < 1:
-                TxDownC = int(i)+int(j)
-
-            root.update_idletasks()
-            time.sleep(1)
-
-        print("hello")
-
-if __name__=='__main__':
-
+if __name__ == '__main__':
 
     root = Tk()
     style = ttk.Style()
     root.title("Python Automator")
-
 
     mainframe = ttk.Frame(root, padding="3 3 12 12")
     mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
@@ -173,10 +185,5 @@ if __name__=='__main__':
     Stimer.grid(column=3, row=7, sticky=(W, E))
 
     for child in mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
-
-    CD_event = threading.Event()
-    CD_thread = threading.Thread(target=countdown(TXon_entry.get(), TXoff_entry.get(), senario_length_entry.get()),
-                                 args=(CD_event,))
-    CD_thread.start()
 
     root.mainloop()
