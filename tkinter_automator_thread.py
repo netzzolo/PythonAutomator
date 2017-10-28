@@ -5,15 +5,17 @@ import threading
 
 # globals
 running = 1
+radionumber =1
+radiochoicelist = []
 
 
 def startauto(*args):
     try:
-        #set running to 1 so the countdown loop runs
+        # set running to 1 so the countdown loop runs
         global running
         running = 1
         print ("start " + str(running))
-        #make the start button look like a stop button
+        # make the start button look like a stop button
         startb.config(relief=SUNKEN, bg="red", text="Stop", command=stopb)
         # Disable All options
         senario_length_entry.config(state=DISABLED)
@@ -73,6 +75,41 @@ def chooselog(*args):
         pass
 
 
+def addradio():
+    try:
+        global radionumber
+        global radiochoicelist
+
+        #remove radio button
+        if radionumber ==1:
+            minusradio = Button(rf, command=removeradio, text="-")
+            minusradio.grid(column=2, row = 1)
+
+        # Radio Dropdown Box
+        radioList = ('choice 1', 'choice 2', 'choice 3')
+        radio = StringVar()
+        radio.set(radioList[0])
+        rmf = LabelFrame(rf, text="Radio " + str(radionumber), labelanchor='nw')
+        rmf.grid()
+        radiochoicelist.append(OptionMenu(rmf, radio, *radioList).grid())
+        radionumber += 1
+        print("radionumber", radionumber)
+        print(radiochoicelist)
+
+    except ValueError:
+        pass
+
+def removeradio():
+    try:
+        global radionumber
+        global radiochoicelist
+        radiochoicelist.pop()
+        radionumber -= 1
+        print(radionumber)
+        print (radiochoicelist)
+    except ValueError:
+        pass
+
 def countdown(i, j, k):
     # CD = threading.currentThread()
     # while getattr(CD, "do_run", TRUE):
@@ -129,60 +166,77 @@ if __name__ == '__main__':
     mainframe.columnconfigure(0, weight=1)
     mainframe.rowconfigure(0, weight=1)
 
-    TXon = StringVar()
-    TXoff = StringVar()
-    senario_length = StringVar()
+    # Scenario Frame
+    sf = LabelFrame(mainframe, text="Scenario Paramaters:", labelanchor='nw', padx=5, pady=5)
+    sf.grid(column=1, row=1, sticky=NW)
 
     # TX up entry box
-    TXon_entry = Entry(mainframe, width=5, textvariable=TXon, justify=CENTER)
+    TXon = StringVar()
+    TXon_entry = Entry(sf, width=5, textvariable=TXon, justify=CENTER)
     TXon_entry.grid(column=1, row=1, sticky=E)
-    ttk.Label(mainframe, text="TX up (s)").grid(column=2, row=1, sticky=W)
+    ttk.Label(sf, text="TX up (s)").grid(column=2, row=1, sticky=W)
 
     # TX down entry box
-    TXoff_entry = Entry(mainframe, width=5, justify=CENTER)
+    TXoff = StringVar()
+    TXoff_entry = Entry(sf, width=5, justify=CENTER)
     TXoff_entry.grid(column=1, row=2, sticky=E)
-    ttk.Label(mainframe, text="TX down (s)").grid(column=2, row=2, sticky=W)
+    ttk.Label(sf, text="TX down (s)").grid(column=2, row=2, sticky=W)
 
     # Scenario Length entry box
-    senario_length_entry = Entry(mainframe, width=5, justify=CENTER)
+    senario_length = StringVar()
+    senario_length_entry = Entry(sf, width=5, justify=CENTER)
     senario_length_entry.grid(column=1, row=3, sticky=E)
-    ttk.Label(mainframe, text="Scenario Length (m)").grid(column=2, row=3)
+    ttk.Label(sf, text="Scenario Length (m)").grid(column=2, row=3)
 
     # Log File Chooser
     logfile = StringVar()
     logbutton = Button(mainframe, text="Choose Log File", command=chooselog)
-    logbutton.grid(column=1, row=4, sticky=E)
+    logbutton.grid(column=1, row=2, sticky=NW)
     ttk.Label(mainframe, textvariable=logfile).grid(column=2, row=4, sticky=(W, E))
 
     # Audio File Chooser
     audiofile = StringVar()
     audiobutton = Button(mainframe, text="Choose Audio File", command=chooseaudio)
-    audiobutton.grid(column=1, row=5, sticky=E)
+    audiobutton.grid(column=1, row=3, sticky=NW)
     ttk.Label(mainframe, textvariable=audiofile).grid(column=2, row=5, sticky=(W, E))
 
     # Start Button
     startb = Button(mainframe, text="Start", command=startauto, padx=3)
     startb.configure(bg="green")
-    startb.grid(column=3, row=1, sticky=W)
+    startb.grid(column=1, row=5, sticky=W)
+
+    # Timer Frame
+    tf = LabelFrame(mainframe, text="Timers:", labelanchor='nw', padx=5, pady=5)
+    tf.grid(column=1, row=4, sticky=NW)
 
     # Timer Watch
     ##TX Remaining
-    txremain_Label = Label(mainframe, text="TX Remaining")
-    txremain_Label.grid(column=3, row=2, sticky=(W, E))
-    txremain = Label(mainframe)
-    txremain.grid(column=3, row=3)
+    txremain_Label = Label(tf, text="TX Remaining")
+    txremain_Label.grid(column=1, row=1, sticky=(W))
+    txremain = Label(tf)
+    txremain.grid(column=1, row=2)
 
     ##Interval Timer
-    Itimer_Label = Label(mainframe, text="Interval Timer")
-    Itimer_Label.grid(column=3, row=4, sticky=(W, E))
-    Itimer = Label(mainframe)
-    Itimer.grid(column=3, row=5, sticky=(W, E))
+    Itimer_Label = Label(tf, text="Interval Timer")
+    Itimer_Label.grid(column=1, row=3, sticky=(W))
+    Itimer = Label(tf)
+    Itimer.grid(column=1, row=4, sticky=(W))
 
     ##Scenario Timer
-    Stimer_Label = Label(mainframe, text="Scenario Remaining")
-    Stimer_Label.grid(column=3, row=6, sticky=(W, E))
-    Stimer = Label(mainframe)
-    Stimer.grid(column=3, row=7, sticky=(W, E))
+    Stimer_Label = Label(tf, text="Scenario Remaining")
+    Stimer_Label.grid(column=1, row=5, sticky=(W))
+    Stimer = Label(tf)
+    Stimer.grid(column=1, row=6, sticky=(W))
+
+    # Radio Chooser Frame
+    rf = LabelFrame(mainframe, text="Radios:", labelanchor='nw', padx=5, pady=5)
+    rf.grid(column=2, sticky=N)
+
+    # Add Radio Button
+    plusradio = Button(rf, command=addradio, text="+")
+    plusradio.grid(column=1, row = 1, sticky=SE)
+
+
 
     for child in mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
 
