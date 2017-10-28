@@ -7,6 +7,7 @@ import threading
 running = 1
 radionumber =1
 radiochoicelist = []
+radiochoiceframe =[]
 
 
 def startauto(*args):
@@ -79,6 +80,7 @@ def addradio():
     try:
         global radionumber
         global radiochoicelist
+        global radiochoiceframe
 
         #remove radio button
         if radionumber ==1:
@@ -89,9 +91,10 @@ def addradio():
         radioList = ('choice 1', 'choice 2', 'choice 3')
         radio = StringVar()
         radio.set(radioList[0])
-        rmf = LabelFrame(rf, text="Radio " + str(radionumber), labelanchor='nw')
-        rmf.grid()
-        radiochoicelist.append(OptionMenu(rmf, radio, *radioList).grid())
+        #rmf = LabelFrame(rf, text="Radio " + str(radionumber), labelanchor='nw').grid()
+        radiochoiceframe.append(LabelFrame(rf, text="Radio " + str(radionumber), labelanchor='nw'))
+        radiochoiceframe[-1].grid()
+        radiochoicelist.append(OptionMenu(radiochoiceframe[-1], radio, *radioList).grid())
         radionumber += 1
         print("radionumber", radionumber)
         print(radiochoicelist)
@@ -103,10 +106,17 @@ def removeradio():
     try:
         global radionumber
         global radiochoicelist
+        global radiochoiceframe
+
+        #radiochoicelist.remove(radionumber)
+        radiochoiceframe[-1].grid_remove()
+        radiochoiceframe.pop()
         radiochoicelist.pop()
         radionumber -= 1
-        print(radionumber)
-        print (radiochoicelist)
+        root.update_idletasks()
+        print('radio number' , radionumber)
+        print ('rcl' , radiochoicelist)
+        print ('rcf' , radiochoiceframe)
     except ValueError:
         pass
 
