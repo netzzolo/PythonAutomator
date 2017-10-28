@@ -8,6 +8,11 @@ running = 1
 radionumber =1
 radiochoicelist = []
 radiochoiceframe =[]
+freqentry = []
+freqlabel=[]
+otherlabel=[]
+otherentry=[]
+radiochoice = []
 
 
 def startauto(*args):
@@ -81,6 +86,11 @@ def addradio():
         global radionumber
         global radiochoicelist
         global radiochoiceframe
+        global freqentry
+        global freqlabel
+        global otherentry
+        global otherlabel
+        global radiochoice
 
         #remove radio button
         if radionumber ==1:
@@ -88,16 +98,30 @@ def addradio():
             minusradio.grid(column=2, row = 1)
 
         # Radio Dropdown Box
-        radioList = ('choice 1', 'choice 2', 'choice 3')
+        radioList = ('choice 1', 'choice 2', 'choice 3', 'other')
         radio = StringVar()
         radio.set(radioList[0])
-        #rmf = LabelFrame(rf, text="Radio " + str(radionumber), labelanchor='nw').grid()
         radiochoiceframe.append(LabelFrame(rf, text="Radio " + str(radionumber), labelanchor='nw'))
-        radiochoiceframe[-1].grid()
-        radiochoicelist.append(OptionMenu(radiochoiceframe[-1], radio, *radioList).grid())
+        radiochoiceframe[-1].grid(column = 1, row = radionumber+1, sticky = W)
+        radiochoicelist.append(OptionMenu(radiochoiceframe[-1], radio, *radioList))
+        radiochoicelist[-1].grid()
+        freqlabel.append(Label(rf, text="Freq "))
+        freqlabel[-1].grid(column=2, row = radionumber+1)
+        freqentry.append(Entry(rf, width = 10, justify=CENTER))
+        freqentry[-1].grid(column=3, row=radionumber+1)
         radionumber += 1
+
+        # #other box
+        # if radiochoicelist[-1].get() == "other":
+        #     otherlabel.append(Label(rf, text="Freq "))
+        #     otherlabel[-1].grid(column=2, row=radionumber + 1)
+        #     otherlabel.append(Entry(rf, width=10, justify=CENTER))
+        #     otherlabel[-1].grid(column=3, row=radionumber + 1)
+
         print("radionumber", radionumber)
         print(radiochoicelist)
+        print(radio.get() , 'var is')
+
 
     except ValueError:
         pass
@@ -107,11 +131,17 @@ def removeradio():
         global radionumber
         global radiochoicelist
         global radiochoiceframe
+        global freqentry
+        global freqlabel
 
         #radiochoicelist.remove(radionumber)
         radiochoiceframe[-1].grid_remove()
         radiochoiceframe.pop()
         radiochoicelist.pop()
+        freqentry[-1].grid_remove()
+        freqentry.pop()
+        freqlabel[-1].grid_remove()
+        freqlabel.pop()
         radionumber -= 1
         root.update_idletasks()
         print('radio number' , radionumber)
@@ -240,11 +270,11 @@ if __name__ == '__main__':
 
     # Radio Chooser Frame
     rf = LabelFrame(mainframe, text="Radios:", labelanchor='nw', padx=5, pady=5)
-    rf.grid(column=2, sticky=N)
+    rf.grid(column=2, row = 1, sticky=N, rowspan = 5)
 
     # Add Radio Button
     plusradio = Button(rf, command=addradio, text="+")
-    plusradio.grid(column=1, row = 1, sticky=SE)
+    plusradio.grid(column=1, row = 1, sticky=N)
 
 
 
