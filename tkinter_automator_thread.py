@@ -117,8 +117,9 @@ def addradio():
         freqentry[-1].grid(column=3, row=radionumber + 1)
 
 
+
         #check for other figure out which box has focus then check if the list is other
-        #freqentry.bind('<ButtonRelease-1>', otherbox)
+        freqentry[-1].bind('<ButtonRelease-1>', otherbox)
 
         # be ready for next radio
         radionumber += 1
@@ -134,16 +135,17 @@ def addradio():
 
 
 def otherbox(*args):
-    global otherlabel
-    global otherentry
-    # other box for radio
-    print('radio get', radio[-1].get())
-    if radio[-1].get() == 'other':
-        print("inhere")
-        otherlabel.append(Label(rf, text="Radio"))
-        otherlabel[-1].grid(column=4, row=radionumber)
-        otherentry.append(Entry(rf, width=10, justify=CENTER))
-        otherentry[-1].grid(column=5, row=radionumber)
+    print("radio number ", radiochoiceframe.widget.cget("text"))
+    # global otherlabel
+    # global otherentry
+    # # other box for radio
+    # print('radio get', radio[-1].get(), event.widget.cget)
+    # if radio[-1].get() == 'other':
+    #     print("inhere")
+    #     otherlabel.append(Label(rf, text="Radio"))
+    #     otherlabel[-1].grid(column=4, row=radionumber)
+    #     otherentry.append(Entry(rf, width=10, justify=CENTER))
+    #     otherentry[-1].grid(column=5, row=radionumber)
 
 
 def removeradio():
