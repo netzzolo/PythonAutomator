@@ -36,6 +36,7 @@ def startauto(*args):
         CD_thread.start()
 
 
+
     except ValueError:
         pass
 
@@ -93,12 +94,12 @@ def addradio():
         global otherlabel
         global radio
 
-        # remove radio button
+        # add remove radio button if there is more than radio
         if radionumber == 1:
             minusradio = Button(rf, command=removeradio, text="-")
             minusradio.grid(column=2, row=1)
 
-        # Radio Dropdown Box4
+        # Radio Dropdown Box
         # radio options
         radioList = ('choice 1', 'choice 2', 'choice 3', 'other')
         # set up list for radio chosen
@@ -106,20 +107,19 @@ def addradio():
         radio[-1].set(radioList[0])
         # draw frame for radio
         radiochoiceframe.append(LabelFrame(rf, text="Radio " + str(radionumber), labelanchor='nw'))
-        radiochoiceframe[-1].grid(column=1, row=radionumber + 1, sticky=W)
+        radiochoiceframe[-1].grid(column=1, row=radionumber + 1, sticky=W, pady=5)
         # add the radio option list to the frame
         radiochoicelist.append(OptionMenu(radiochoiceframe[-1], radio[-1], *radioList))
         radiochoicelist[-1].grid()
         # add the freq box
         freqlabel.append(Label(rf, text="Freq "))
-        freqlabel[-1].grid(column=2, row=radionumber + 1)
-        freqentry.append(Entry(rf, width=10, justify=CENTER))
+        freqlabel[-1].grid(column=2, row=radionumber + 1, padx=5)
+        freqentry.append(Entry(rf, width=10, justify=CENTER, text=str(radionumber)))
         freqentry[-1].grid(column=3, row=radionumber + 1)
 
+        #bind mouse click to freq entry box, check pass which "radio#" is worked on and which radio option
 
-
-        #check for other figure out which box has focus then check if the list is other
-        freqentry[-1].bind('<ButtonRelease-1>', otherbox)
+        freqentry[-1].bind('<ButtonRelease-1>', lambda event: radiotasks(event.widget.cget("text")))
 
         # be ready for next radio
         radionumber += 1
@@ -134,18 +134,23 @@ def addradio():
         pass
 
 
-def otherbox(*args):
-    print("radio number ", radiochoiceframe.widget.cget("text"))
-    # global otherlabel
-    # global otherentry
-    # # other box for radio
-    # print('radio get', radio[-1].get(), event.widget.cget)
-    # if radio[-1].get() == 'other':
-    #     print("inhere")
-    #     otherlabel.append(Label(rf, text="Radio"))
-    #     otherlabel[-1].grid(column=4, row=radionumber)
-    #     otherentry.append(Entry(rf, width=10, justify=CENTER))
-    #     otherentry[-1].grid(column=5, row=radionumber)
+def radiotasks(i):
+    global otherlabel
+    global otherentry
+    global freqentry
+    global radio
+    radioindex = int(i)
+    # other box for radio
+    print('radio box chosen', "Radio "+str(i))
+    print('radio index ', radioindex)
+    print('radio choice right now ', radio[radioindex-1].get())
+    print('freq entered ', freqentry[radioindex-1].get())
+    if radio[radioindex-1].get() == 'other':
+        print("inhere")
+        otherlabel.append(Label(rf, text="Radio"))
+        otherlabel[-1].grid(column=4, row=radioindex+1, padx=5)
+        otherentry.append(Entry(rf, width=10, justify=CENTER))
+        otherentry[-1].grid(column=5, row=radioindex+1)
 
 
 def removeradio():
@@ -157,28 +162,35 @@ def removeradio():
         global freqlabel
         global otherentry
         global otherlabel
+        global radio
+
+        print("current choice ", radio[-1].get())
+
+        #remove other box
+        if radio[-1].get()=='other':
+            print('removing other')
+            otherlabel[-1].grid_remove()
+            otherlabel.pop()
+            otherentry[-1].grid_remove()
+            otherentry.pop()
 
         #radio choice frame
         radiochoiceframe[-1].grid_remove()
         radiochoiceframe.pop()
         radiochoicelist.pop()
+        radio.pop()
         #freq box
         freqentry[-1].grid_remove()
         freqentry.pop()
         freqlabel[-1].grid_remove()
         freqlabel.pop()
-        #other
-        otherlabel[-1].grid_remove()
-        otherlabel.pop()
-        otherentry[-1].grid_remove()
-        otherentry.pop()
+
 
         #reduce radio number
         radionumber -= 1
         root.update_idletasks()
         print('radio number', radionumber)
-        print ('rcl', radiochoicelist)
-        print ('rcf', radiochoiceframe)
+
     except ValueError:
         pass
 
@@ -225,8 +237,9 @@ def countdown(i, j, k):
         root.update_idletasks()
         time.sleep(1)
 
-    print("hello")
+#def log(*args):
 
+    #write to logfile
 
 if __name__ == '__main__':
 
